@@ -100,11 +100,7 @@ Entre los eventos que pueden analizarse se encuentran:
 * Comportamientos potencialmente sospechosos
 * Alertas de seguridad
 
-La configuración y los procedimientos utilizados se documentan en:
-
-```text
-docs/monitoring/
-```
+La configuración y los procedimientos utilizados se documentan en [`docs/architecture.md`](docs/architecture.md).
 
 ---
 
@@ -124,10 +120,10 @@ Cada investigación puede incluir:
 * Resultado
 * Acciones realizadas
 
-Las evidencias visuales se almacenarán en:
+Las evidencias visuales de alertas y paneles se almacenarán en:
 
 ```text
-screenshots/incidents/
+screenshots/dashboard/
 ```
 
 ---
@@ -157,31 +153,20 @@ secops-lab/
 ├── README.md
 ├── LICENSE
 │
+├── docs/
+│   └── architecture.md
+│
 ├── wazuh/
 │   └── rules/
-│
-├── docs/
-│   ├── architecture/
-│   │   └── architecture.md
-│   │
-│   ├── monitoring/
-│   │   └── wazuh.md
-│   │
-│   ├── incidents/
-│   │   └── README.md
-│   │
-│   └── security-testing/
-│       └── README.md
 │
 ├── dashboards/
 │   ├── grafana/
 │   └── wazuh/
 │
 └── screenshots/
-    ├── architecture/
-    ├── wazuh/
-    ├── alerts/
-    └── incidents/
+    ├── install/
+    ├── agents/
+    └── dashboard/
 ```
 
 La estructura podrá ampliarse a medida que se incorporen nuevas funcionalidades.
@@ -233,19 +218,15 @@ Las pruebas de seguridad deben realizarse únicamente contra sistemas propios o 
 
 ## Documentación
 
-La documentación detallada del proyecto se encuentra en:
+La documentación de la arquitectura del laboratorio se encuentra en:
 
-```text
-docs/
-```
-
-Cada componente dispone de documentación específica sobre sus configuraciones, integración y funcionamiento.
+* [Arquitectura de SecOps Lab](docs/architecture.md)
 
 ---
 
 <div align="center">
 
-**Última actualización:** 26/09/2026
+**Última actualización:** 02/11/2026
 
 ---
 ### Author
