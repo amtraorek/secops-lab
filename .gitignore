@@ -1,0 +1,60 @@
+# -----------------------------------------------------------------------------
+# SecOps Lab - .gitignore
+# -----------------------------------------------------------------------------
+
+# --- Secretos y credenciales sensibles ---
+.env
+.env.*
+*.env
+*.pem
+*.key
+*.crt
+*.csr
+*.pfx
+*.p12
+*.cer
+*.jks
+
+# Wazuh agent keys & credentials
+client.keys
+*.pass
+*.password
+secrets/
+
+# --- Logs y archivos temporales ---
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+*.dump
+
+# --- Backups y empaquetados pesados ---
+*.tar
+*.gz
+*.tar.gz
+*.tgz
+*.zip
+*.7z
+*.rar
+
+# --- Archivos del sistema operativo ---
+.DS_Store
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+
+# --- Entornos de desarrollo e IDEs ---
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# --- Python / Entornos virtuales (si se usan scripts) ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
