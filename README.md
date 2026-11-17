@@ -85,7 +85,7 @@ secops-lab/
 
 <div align="center">
 
-**Última actualización:** 03/11/2026
+**Última actualización:** 17/11/2026
 
 ---
 
