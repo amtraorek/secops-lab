@@ -227,7 +227,7 @@ La documentación de la arquitectura del laboratorio se encuentra en:
 
 <div align="center">
 
-**Última actualización:** 02/11/2026
+**Última actualización:** 17/11/2026
 
 ---
 ### Author
