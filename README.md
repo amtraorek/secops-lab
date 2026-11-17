@@ -51,24 +51,11 @@ El objetivo es construir un entorno práctico para aprender y experimentar con m
 
 SecOps Lab se integra en la VLAN de seguridad de CoreLab (`10.10.20.0/24`) y recibe eventos de los endpoints a través de OPNsense. El manager centraliza la recogida de logs, la correlación de reglas y la generación de alertas.
 
-```text
-                         CoreLab
-                            │
-                    Eventos de seguridad
-                            │
-                            ▼
-                    ┌───────────────┐
-                    │     Wazuh     │
-                    │  4.14.9 (VM)  │
-                    └───────┬───────┘
-                            │
-              ┌─────────────┴─────────────┐
-              ▼                           ▼
-        Dashboards                  Alertas / análisis
-   (Overview, Discover)      (FIM, SCA, vulnerabilidades)
-```
+![Diagrama de arquitectura de SecOps Lab](screenshots/architecture/secops-lab-diagram-version1.png)
 
-El diagrama detallado y el flujo de eventos están documentados en [`docs/architecture.md`](docs/architecture.md).
+*Arquitectura actual: VLAN 20 de seguridad, Wazuh y los 13 agentes monitorizados.*
+
+El flujo de eventos y el detalle de los componentes están documentados en [`docs/architecture.md`](docs/architecture.md).
 
 ---
 

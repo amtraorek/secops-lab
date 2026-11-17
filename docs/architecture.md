@@ -34,25 +34,9 @@ Los endpoints se comunican con el manager a través de OPNsense. Las reglas **De
 
 ## Diagrama de arquitectura
 
-```text
-                 CoreLab
-                    │
-                    ▼
-             Security Events
-                    │
-                    ▼
-                  Wazuh
-                    │
-          ┌─────────┴─────────┐
-          ▼                   ▼
-      Alerts              Analysis
-          │                   │
-          └─────────┬─────────┘
-                    ▼
-            Security Testing
-```
+![Diagrama de arquitectura de SecOps Lab](../screenshots/architecture/secops-lab-diagram-version1.png)
 
-<!-- Diagrama visual pendiente de incorporar en screenshots/architecture/ -->
+*Arquitectura actual de SecOps Lab: VLAN 20 de seguridad, Wazuh y los agentes monitorizados.*
 
 ## Componentes
 
