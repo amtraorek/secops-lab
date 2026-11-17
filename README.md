@@ -1,148 +1,143 @@
 # SecOps Lab
 
-> Laboratorio personal de operaciones de seguridad para la monitorización, detección y análisis de la infraestructura CoreLab.
+> Laboratorio personal de operaciones de seguridad — monitorización, detección y análisis de la infraestructura CoreLab.
 
-**Estado:** Activo — desarrollo continuo
+> **Estado:** 🟢 Activo — desarrollo continuo
 
-![Wazuh](https://img.shields.io/badge/Wazuh-4A90E2?style=for-the-badge&logo=wazuh&logoColor=white)
-![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
-![Proxmox](https://img.shields.io/badge/Proxmox-E57000?style=for-the-badge&logo=proxmox&logoColor=white)
+![Wazuh](https://img.shields.io/badge/Wazuh-4.14.9-3A8DDE?style=flat)
+![Proxmox](https://img.shields.io/badge/Proxmox_VE-9.2.18-E57000?style=flat&logo=proxmox&logoColor=white)
+![Debian](https://img.shields.io/badge/Debian-13-A81D33?style=flat&logo=debian&logoColor=white)
+![OPNsense](https://img.shields.io/badge/OPNsense-D94F00?style=flat&logo=opnsense&logoColor=white)
+![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat&logo=linux&logoColor=black)
 
 ---
 
 ## Descripción
 
-SecOps Lab es un laboratorio personal de operaciones de seguridad diseñado para monitorizar y analizar la infraestructura de **CoreLab**.
+SecOps Lab es un laboratorio personal de operaciones de seguridad diseñado para monitorizar y analizar la infraestructura de **CoreLab**. Funciona como una capa de seguridad sobre la infraestructura existente: recopila eventos, correlaciona actividad y genera alertas a partir de los sistemas monitorizados.
 
-El proyecto funciona como una capa de seguridad sobre la infraestructura existente, recopilando eventos y generando alertas.
-
-La primera versión se centra exclusivamente en la monitorización de CoreLab mediante **Wazuh**. Otros componentes (detección de red, automatización de workflows, análisis asistido mediante IA local, notificaciones) se irán incorporando en fases futuras a medida que estén implementados y verificados.
+La primera versión se centra en **Wazuh** como plataforma central de monitorización. Otros componentes —detección de red, automatización de workflows, análisis asistido mediante IA local y notificaciones— se incorporarán en fases posteriores, una vez implementados y verificados.
 
 El objetivo es construir un entorno práctico para aprender y experimentar con monitorización de seguridad, detección de amenazas, análisis de eventos y automatización de respuestas.
+
+![Vista general del dashboard de Wazuh](screenshots/dashboard/01-vision-general.png)
+
+*Vista general del dashboard: estado de los agentes y alertas de las últimas 24 horas.*
+
+<p align="center">
+  <img src="screenshots/install/01-proxmox-vm-wazuh.png" width="32%" />
+  <img src="screenshots/agents/04-agentes-registrados.png" width="32%" />
+  <img src="screenshots/network/01-nat-wazuh.png" width="32%" />
+</p>
+
+*Servidor Wazuh en Proxmox, agentes registrados y reglas NAT en OPNsense.*
 
 ---
 
 ## Índice
 
-* [Arquitectura](#arquitectura)
-* [Infraestructura monitorizada](#infraestructura-monitorizada)
-* [Tecnologías](#tecnologías)
-* [Monitorización](#monitorización)
-* [Investigación de incidentes](#investigación-de-incidentes)
-* [Resultados](#resultados)
-* [Estructura del repositorio](#estructura-del-repositorio)
-* [Roadmap](#roadmap)
-* [Consideraciones de seguridad](#consideraciones-de-seguridad)
-* [Documentación](#documentación)
-* [Autor](#autor)
+- [Arquitectura](#arquitectura)
+- [Infraestructura](#infraestructura)
+- [Agentes monitorizados](#agentes-monitorizados)
+- [Tecnologías](#tecnologías)
+- [Documentación](#documentación)
+- [Estructura del repositorio](#estructura-del-repositorio)
+- [Roadmap](#roadmap)
+- [Consideraciones de seguridad](#consideraciones-de-seguridad)
 
 ---
 
 ## Arquitectura
 
-La arquitectura de SecOps Lab se integra directamente con CoreLab.
+SecOps Lab se integra en la VLAN de seguridad de CoreLab (`10.10.20.0/24`) y recibe eventos de los endpoints a través de OPNsense. El manager centraliza la recogida de logs, la correlación de reglas y la generación de alertas.
 
 ```text
-                         CORELAB
+                         CoreLab
                             │
-                          Wazuh
+                    Eventos de seguridad
                             │
-                       Eventos / Alertas
+                            ▼
+                    ┌───────────────┐
+                    │     Wazuh     │
+                    │  4.14.9 (VM)  │
+                    └───────┬───────┘
+                            │
+              ┌─────────────┴─────────────┐
+              ▼                           ▼
+        Dashboards                  Alertas / análisis
+   (Overview, Discover)      (FIM, SCA, vulnerabilidades)
 ```
 
-Este flujo se ampliará progresivamente a medida que se incorporen nuevos componentes (ver Roadmap).
+El diagrama detallado y el flujo de eventos están documentados en [`docs/architecture.md`](docs/architecture.md).
 
 ---
 
-## Infraestructura monitorizada
+## Infraestructura
 
-Actualmente SecOps Lab monitoriza exclusivamente la infraestructura de **CoreLab**.
+| Componente | Detalle |
+|---|---|
+| **Hipervisor** | Proxmox VE 9.2.18 (nodo `server`) |
+| **VM del SIEM** | `202` — `soc-server-wazuh` |
+| **Recursos** | 4 vCPU · 4 GB RAM · 50 GB disco |
+| **Sistema base** | Debian 13 (*trixie*) |
+| **Plataforma** | Wazuh 4.14.9 (indexer, manager y dashboard) |
+| **IP del manager** | `10.10.20.2` |
+| **Dashboard** | `https://siem.traore.home` (HTTPS/443) |
+| **Puertos de agentes** | `1514/TCP` (eventos) y `1515/TCP` (registro) |
 
-CoreLab proporciona el entorno sobre el que se generan los eventos que posteriormente son analizados por SecOps Lab.
+La comunicación de los agentes atraviesa OPNsense mediante reglas **Destination NAT**. Los detalles están en [`docs/network.md`](docs/network.md).
 
-La infraestructura incluye componentes como:
+---
 
-* Proxmox VE
-* Máquinas virtuales
-* Contenedores
-* Linux
-* OPNsense
-* Servicios autoalojados
-* Servicios de red y almacenamiento
+## Agentes monitorizados
 
-La integración concreta de cada componente se documentará individualmente a medida que sea incorporado al sistema de monitorización.
+Actualmente hay **13 agentes registrados**: 12 activos y `vpn-tailscale` pendiente de conexión.
+
+| ID | Agente | IP | Sistema operativo | Estado |
+|---|---|---|---|---|
+| 001 | `core-adguard` | 10.10.10.3 | Debian 12 | ✅ Activo |
+| 002 | `core-bind9` | 10.10.10.4 | Debian 12 | ✅ Activo |
+| 003 | `core-nginx` | 10.10.10.5 | Debian 12 | ✅ Activo |
+| 004 | `core-vault` | 10.10.10.6 | Debian 12 | ✅ Activo |
+| 005 | `core-nextcloud` | 10.10.10.7 | Debian 12 | ✅ Activo |
+| 006 | `core-immich` | 10.10.10.8 | Debian 12 | ✅ Activo |
+| 007 | `core-uptime` | 10.10.10.9 | Debian 12 | ✅ Activo |
+| 008 | `core-dashboard` | 10.10.10.11 | Debian 13 | ✅ Activo |
+| 009 | `core-nas` | 10.10.10.2 | Debian 13 | ✅ Activo |
+| 010 | `DESKTOP-RHQ7Q7DP` | 192.168.1.77 | Windows 11 Pro | ✅ Activo |
+| 011 | `opnsense.traore.home` | 10.10.20.1 | FreeBSD 15.1 | ✅ Activo |
+| 012 | `vpn-wireguard` | 10.10.40.2 | Debian 12 | ✅ Activo |
+| 013 | `vpn-tailscale` | any | — | ⚠️ Nunca conectado |
+
+La instalación y el registro de cada tipo de agente se documentan en [`docs/despliegue-agentes.md`](docs/despliegue-agentes.md).
 
 ---
 
 ## Tecnologías
 
-| Tecnología       | Función                                                        |
-| ---------------- | -------------------------------------------------------------- |
-| **Wazuh**        | Monitorización, recopilación de eventos y alertas de seguridad |
-| **Linux**        | Sistemas monitorizados y componentes del entorno               |
-| **Proxmox VE**   | Infraestructura de virtualización de CoreLab                   |
-| **OPNsense**     | Firewall y componente de red de CoreLab                        |
+| Tecnología | Versión | Función |
+|---|---|---|
+| **Wazuh** | 4.14.9 | SIEM: recogida de eventos, correlación, alertas, FIM, SCA y detección de vulnerabilidades |
+| **Proxmox VE** | 9.2.18 | Virtualización del servidor de monitorización |
+| **Debian** | 13 (*trixie*) | Sistema operativo del servidor Wazuh |
+| **OPNsense** | — | Firewall, router inter-VLAN y NAT de los puertos de agentes |
+| **FreeBSD** | 15.1 | Sistema operativo del firewall monitorizado |
+| **Windows 11 Pro** | 10.0.26300.9711 | Endpoint de escritorio monitorizado |
 
 ---
 
-## Monitorización
+## Documentación
 
-**Wazuh** constituye el componente principal de monitorización del proyecto.
+| Documento | Contenido |
+|---|---|
+| [Arquitectura de SecOps Lab](docs/architecture.md) | Componentes, flujo de eventos y alcance del laboratorio |
+| [Instalación de Wazuh](docs/installation.md) | Despliegue *todo en uno* en una VM de Proxmox |
+| [Despliegue de agentes](docs/despliegue-agentes.md) | Registro y configuración en Linux, Windows y OPNsense |
+| [Red y conectividad](docs/network.md) | Reglas NAT, puertos requeridos y comprobaciones |
+| [Dashboard y detección](docs/dashboard.md) | Overview, Discover, vulnerabilidades y SCA |
+| [Resolución de problemas](docs/troubleshooting.md) | Incidencias encontradas y soluciones aplicadas |
 
-Se utiliza para recopilar y analizar eventos procedentes de los sistemas monitorizados y generar alertas cuando se detectan comportamientos relevantes.
-
-Entre los eventos que pueden analizarse se encuentran:
-
-* Intentos de autenticación
-* Cambios en sistemas
-* Actividad de servicios
-* Eventos del sistema
-* Comportamientos potencialmente sospechosos
-* Alertas de seguridad
-
-La configuración y los procedimientos utilizados se documentan en [`docs/architecture.md`](docs/architecture.md).
-
----
-
-## Investigación de incidentes
-
-Los eventos relevantes podrán documentarse como casos de investigación.
-
-Cada investigación puede incluir:
-
-* Fecha
-* Objetivo
-* Evento detectado
-* Fuente
-* Evidencias
-* Alertas generadas
-* Análisis
-* Resultado
-* Acciones realizadas
-
-Las evidencias visuales de alertas y paneles se almacenarán en:
-
-```text
-screenshots/dashboard/
-```
-
----
-
-## Resultados
-
-El proyecto permitirá documentar resultados reales obtenidos durante la monitorización.
-
-Entre ellos:
-
-* Alertas generadas por Wazuh
-* Investigaciones de seguridad
-* Resultados de pruebas controladas
-
-Las evidencias visuales estarán disponibles en:
-
-```text
-screenshots/
-```
+Las capturas de cada fase están disponibles en [`screenshots/`](screenshots/).
 
 ---
 
@@ -151,85 +146,81 @@ screenshots/
 ```text
 secops-lab/
 ├── README.md
-├── LICENSE
-│
 ├── docs/
-│   └── architecture.md
-│
+│   ├── architecture.md
+│   ├── installation.md
+│   ├── despliegue-agentes.md
+│   ├── network.md
+│   ├── dashboard.md
+│   └── troubleshooting.md
+├── screenshots/
+│   ├── architecture/
+│   ├── install/
+│   ├── agents/
+│   ├── dashboard/
+│   ├── network/
+│   └── troubleshooting/
 ├── wazuh/
 │   └── rules/
-│
-├── dashboards/
-│   ├── grafana/
-│   └── wazuh/
-│
-└── screenshots/
-    ├── install/
-    ├── agents/
-    └── dashboard/
+└── dashboards/
+    ├── grafana/
+    └── wazuh/
 ```
 
-La estructura podrá ampliarse a medida que se incorporen nuevas funcionalidades.
+La estructura se ampliará a medida que se incorporen reglas personalizadas, dashboards y nuevas fuentes de eventos.
 
 ---
 
 ## Roadmap
 
-### Fase 1 — CoreLab (en curso)
+### Fase 1 — Monitorización de CoreLab
 
-* [x] Definir arquitectura inicial
-* [x] Integrar Wazuh
-* [ ] Configurar monitorización avanzada
-* [ ] Realizar pruebas de seguridad controladas
-* [ ] Documentar investigaciones
+- [x] Definir la arquitectura inicial
+- [x] Desplegar Wazuh en modo *todo en uno*
+- [x] Registrar agentes Linux, Windows y OPNsense
+- [x] Publicar los puertos de agentes mediante NAT en OPNsense
+- [x] Documentar la instalación, el despliegue de agentes y los dashboards
+- [ ] Configurar monitorización avanzada
+- [ ] Realizar pruebas de seguridad controladas
+- [ ] Documentar investigaciones
 
 ### Fase 2 — Ampliación
 
-* [ ] Integrar Suricata (detección de red)
-* [ ] Configurar n8n (automatización de workflows)
-* [ ] Integrar Ollama (análisis asistido mediante IA local)
-* [ ] Integrar Telegram (notificaciones)
-* [ ] Ampliar fuentes de eventos y reglas de detección
+- [ ] Integrar Suricata (detección de red)
+- [ ] Configurar n8n (automatización de workflows)
+- [ ] Integrar Ollama (análisis asistido mediante IA local)
+- [ ] Integrar Telegram (notificaciones)
+- [ ] Ampliar fuentes de eventos y reglas de detección
 
 ### Futuro
 
-La integración con otros entornos, como un laboratorio de Active Directory y sistemas Windows, se realizará en fases posteriores.
-
-Estas funcionalidades no forman parte del alcance actual de SecOps Lab.
+La integración con otros entornos, como un laboratorio de Active Directory y sistemas Windows, se realizará en fases posteriores. Estas funcionalidades no forman parte del alcance actual de SecOps Lab.
 
 ---
 
 ## Consideraciones de seguridad
 
-
 SecOps Lab monitoriza una infraestructura personal y debe mantenerse correctamente aislado.
 
 El proyecto no debe contener:
 
-* Contraseñas
-* API keys
-* Tokens
-* Credenciales
-* Información privada
-* Configuraciones sensibles
+- Contraseñas
+- API keys
+- Tokens
+- Credenciales
+- Información privada
+- Configuraciones sensibles
 
 Las pruebas de seguridad deben realizarse únicamente contra sistemas propios o entornos sobre los que exista autorización explícita.
 
 ---
 
-## Documentación
-
-La documentación de la arquitectura del laboratorio se encuentra en:
-
-* [Arquitectura de SecOps Lab](docs/architecture.md)
-
----
-
 <div align="center">
 
-**Última actualización:** 17/11/2026
+**Última actualización:** 18/11/2026
 
 ---
+
 ### Author
 
 **Amadou Traore Keita**
