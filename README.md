@@ -201,6 +201,7 @@ Estas funcionalidades no forman parte del alcance actual de SecOps Lab.
 
 ## Consideraciones de seguridad
 
+
 SecOps Lab monitoriza una infraestructura personal y debe mantenerse correctamente aislado.
 
 El proyecto no debe contener:
