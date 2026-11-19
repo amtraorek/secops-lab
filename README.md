@@ -94,7 +94,7 @@ Actualmente hay **13 agentes registrados**: 12 activos y `vpn-tailscale` pendien
 | 010 | `DESKTOP-RHQ7Q7DP` | 192.168.1.77 | Windows 11 Pro | ✅ Activo |
 | 011 | `opnsense.traore.home` | 10.10.20.1 | FreeBSD 15.1 | ✅ Activo |
 | 012 | `vpn-wireguard` | 10.10.40.2 | Debian 12 | ✅ Activo |
-| 013 | `vpn-tailscale` | any | — | ⚠️ Nunca conectado |
+| 013 | `vpn-tailscale` | 10.10.40.3 | — | ✅ Activo |
 
 La instalación y el registro de cada tipo de agente se documentan en [`docs/despliegue-agentes.md`](docs/despliegue-agentes.md).
 
@@ -204,7 +204,7 @@ Las pruebas de seguridad deben realizarse únicamente contra sistemas propios o 
 
 <div align="center">
 
-**Última actualización:** 18/11/2026
+**Última actualización:** 19/11/2026
 
 ---
 
