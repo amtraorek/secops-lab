@@ -45,7 +45,6 @@ El objetivo es construir un entorno práctico para aprender y experimentar con m
 - [Documentación](#documentación)
 - [Estructura del repositorio](#estructura-del-repositorio)
 - [Roadmap](#roadmap)
-- [Consideraciones de seguridad](#consideraciones-de-seguridad)
 
 ---
 
@@ -217,25 +216,6 @@ La estructura se ampliará a medida que se incorporen reglas personalizadas, das
 ### Futuro
 
 La integración con otros entornos, como un laboratorio de Active Directory y sistemas Windows, se realizará en fases posteriores. Estas funcionalidades no forman parte del alcance actual de SecOps Lab.
-
----
-
-## Consideraciones de seguridad
-
-SecOps Lab monitoriza una infraestructura personal y debe mantenerse correctamente aislado.
-
-El proyecto no debe contener:
-
-- Contraseñas
-- API keys
-- Tokens
-- Credenciales
-- Información privada
-- Configuraciones sensibles
-
-Las pruebas de seguridad deben realizarse únicamente contra sistemas propios o entornos sobre los que exista autorización explícita.
-
-Metasploitable 2 es un sistema intencionadamente vulnerable y no debe exponerse fuera de la VLAN de laboratorio. El acceso RDP publicado en OPNsense debe limitarse a la VPN o a direcciones de confianza en un entorno real.
 
 ---
 
