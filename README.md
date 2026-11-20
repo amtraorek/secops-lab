@@ -213,9 +213,6 @@ La estructura se ampliará a medida que se incorporen reglas personalizadas, das
 - [ ] Integrar Telegram (notificaciones)
 - [ ] Ampliar fuentes de eventos y reglas de detección
 
-### Futuro
-
-La integración con otros entornos, como un laboratorio de Active Directory y sistemas Windows, se realizará en fases posteriores. Estas funcionalidades no forman parte del alcance actual de SecOps Lab.
 
 ---
 
