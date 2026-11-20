@@ -101,6 +101,46 @@ service wazuh-agent start
 
 Comprobar el estado del agente en el dashboard (**Endpoints**) o en el propio sistema.
 
+### Metasploitable 2: arranque detenido en initramfs
+
+**Síntoma:** tras crear la VM e importar el disco, el arranque se detiene siempre en `initramfs` con el mensaje:
+
+```text
+ALERT! /dev/mapper/metasploitable-root does not exist. Dropping to a shell!
+```
+
+![Error de initramfs en Metasploitable 2](../screenshots/pentesting/metasploitable/03-error-initramfs.png)
+
+*El volumen raíz LVM no aparece porque el kernel no reconoce el disco SCSI.*
+
+**Causa:** el kernel 2.6 de Metasploitable 2 no reconoce el disco VirtIO SCSI con la configuración inicial. La VM se recreó varias veces y todas las variantes con `scsi0` fallaban en el mismo punto.
+
+**Resolución:** mover el disco a IDE y arrancar desde él:
+
+```bash
+qm set 305 --ide0 local-lvm:vm-305-disk-0
+qm set 305 --delete scsi0
+qm set 305 --boot order=ide0
+```
+
+La configuración final (disco IDE, 512 MB de memoria y red VLAN 30) se muestra en la captura de hardware de [Laboratorio de pruebas](pentesting.md#intentos-fallidos-y-corrección). El procedimiento completo está en la misma página.
+
+### Kali: xrdp no escucha en el puerto 3389
+
+**Síntoma:** después de instalar `xrdp`, `nmap` no muestra el puerto `3389` abierto y `ss -tlnp` no lista el servicio.
+
+**Causa:** el paquete queda instalado, pero el servicio está deshabilitado (`disabled/static`) y no se inicia automáticamente.
+
+**Resolución:**
+
+```bash
+sudo systemctl enable --now xrdp
+ss -tlnp | grep 3389
+nmap -p 3389 10.10.30.3
+```
+
+El resultado esperado es `3389/tcp open`. Si el puerto está abierto en Kali pero no se alcanza desde la WAN, revisar la regla NAT y la regla de firewall de OPNsense descritas en [Red y conectividad](network.md#regla-nat-para-kali-linux-xrdp).
+
 ### Debian: `sudo` no instalado
 
 **Síntoma:** al ejecutar el instalador de Wazuh con `sudo`, la shell responde:
@@ -139,10 +179,13 @@ Los errores de dirección del manager (`4112`, `1215`) se corrigen con los pasos
 - El agente figura como `active` en **Endpoints**.
 - El log no repite los errores `4112` ni `1215`.
 - La conectividad con `10.10.20.2:1514` devuelve `TcpTestSucceeded: True`.
+- Metasploitable 2 arranca sin errores de `initramfs` y responde en `10.10.30.5`.
+- xrdp escucha en `3389/TCP` y la regla NAT de OPNsense redirige a `10.10.30.3`.
 
 ## Documentación relacionada
 
 - [Arquitectura de SecOps Lab](architecture.md)
+- [Laboratorio de pruebas](pentesting.md)
 - [Instalación de Wazuh](installation.md)
 - [Despliegue de agentes](despliegue-agentes.md)
 - [Red y conectividad](network.md)

@@ -15,7 +15,7 @@ En la última captura del laboratorio aparecen **13 agentes registrados**:
 - Nodos Linux Debian 12/13 (`core-adguard`, `core-bind9`, `core-nginx`, `core-vault`, `core-nextcloud`, `core-immich`, `core-uptime`, `core-dashboard`, `core-nas`).
 - Un endpoint Windows 11 (`DESKTOP-RHQ7Q7DP`).
 - El firewall OPNsense (`opnsense.traore.home`, FreeBSD).
-- Dos agentes de VPN (`vpn-wireguard` y `vpn-tailscale`); este último aún sin conexión en la captura.
+- Dos agentes de VPN (`vpn-wireguard` y `vpn-tailscale`).
 
 ![Agentes registrados](../screenshots/agents/04-agentes-registrados.png)
 

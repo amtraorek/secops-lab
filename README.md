@@ -9,6 +9,7 @@
 ![Debian](https://img.shields.io/badge/Debian-13-A81D33?style=flat&logo=debian&logoColor=white)
 ![OPNsense](https://img.shields.io/badge/OPNsense-D94F00?style=flat&logo=opnsense&logoColor=white)
 ![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat&logo=linux&logoColor=black)
+![Kali Linux](https://img.shields.io/badge/Kali_Linux-557C94?style=flat&logo=kalilinux&logoColor=white)
 
 ---
 
@@ -16,7 +17,7 @@
 
 SecOps Lab es un laboratorio personal de operaciones de seguridad diseñado para monitorizar y analizar la infraestructura de **CoreLab**. Funciona como una capa de seguridad sobre la infraestructura existente: recopila eventos, correlaciona actividad y genera alertas a partir de los sistemas monitorizados.
 
-La primera versión se centra en **Wazuh** como plataforma central de monitorización. Otros componentes —detección de red, automatización de workflows, análisis asistido mediante IA local y notificaciones— se incorporarán en fases posteriores, una vez implementados y verificados.
+La primera versión se centra en **Wazuh** como plataforma central de monitorización. Además, el laboratorio incorpora un entorno aislado de pruebas con **Metasploitable 2** y **Kali Linux** para validar detecciones y practicar pruebas controladas. Otros componentes —detección de red, automatización de workflows, análisis asistido mediante IA local y notificaciones— se incorporarán en fases posteriores, una vez implementados y verificados.
 
 El objetivo es construir un entorno práctico para aprender y experimentar con monitorización de seguridad, detección de amenazas, análisis de eventos y automatización de respuestas.
 
@@ -37,6 +38,7 @@ El objetivo es construir un entorno práctico para aprender y experimentar con m
 ## Índice
 
 - [Arquitectura](#arquitectura)
+- [Laboratorio de pruebas](#laboratorio-de-pruebas)
 - [Infraestructura](#infraestructura)
 - [Agentes monitorizados](#agentes-monitorizados)
 - [Tecnologías](#tecnologías)
@@ -59,6 +61,26 @@ El flujo de eventos y el detalle de los componentes están documentados en [`doc
 
 ---
 
+## Laboratorio de pruebas
+
+Además de la monitorización, SecOps Lab incorpora un laboratorio aislado en la VLAN 30 (`10.10.30.0/24`) para practicar pruebas de seguridad controladas:
+
+- **Metasploitable 2** (`305`, `10.10.30.5`) como objetivo vulnerable.
+- **Kali Linux** (`303`, `10.10.30.3`) como estación de pruebas.
+- **RDP** publicado en OPNsense (`3389/TCP`) para administrar Kali desde la red de gestión.
+
+<p align="center">
+  <img src="screenshots/pentesting/metasploitable/02-hardware-corregido.png" width="32%" />
+  <img src="screenshots/pentesting/kali/02-escritorio-red.png" width="32%" />
+  <img src="screenshots/network/02-nat-xrdp.png" width="32%" />
+</p>
+
+*Configuración de Metasploitable 2, Kali Linux en la VLAN 30 y regla NAT para RDP.*
+
+Metasploitable 2 se recreó varias veces porque el arranque fallaba con el disco SCSI; la configuración definitiva utiliza un disco IDE. El procedimiento completo, los intentos fallidos y la publicación de RDP están en [`docs/pentesting.md`](docs/pentesting.md).
+
+---
+
 ## Infraestructura
 
 | Componente | Detalle |
@@ -71,6 +93,10 @@ El flujo de eventos y el detalle de los componentes están documentados en [`doc
 | **IP del manager** | `10.10.20.2` |
 | **Dashboard** | `https://siem.traore.home` (HTTPS/443) |
 | **Puertos de agentes** | `1514/TCP` (eventos) y `1515/TCP` (registro) |
+| **Red de laboratorio** | VLAN 30 — `10.10.30.0/24` |
+| **VM objetivo** | `305` — `lab-metasploitable2` (`10.10.30.5`) |
+| **VM de pruebas** | `303` — `lab-pentesting-kali` (`10.10.30.3`) |
+| **Acceso RDP** | `3389/TCP` publicado en OPNsense |
 
 La comunicación de los agentes atraviesa OPNsense mediante reglas **Destination NAT**. Los detalles están en [`docs/network.md`](docs/network.md).
 
@@ -78,7 +104,7 @@ La comunicación de los agentes atraviesa OPNsense mediante reglas **Destination
 
 ## Agentes monitorizados
 
-Actualmente hay **13 agentes registrados**: 12 activos y `vpn-tailscale` pendiente de conexión.
+Actualmente hay **13 agentes registrados**. El estado de cada uno se muestra en la tabla.
 
 | ID | Agente | IP | Sistema operativo | Estado |
 |---|---|---|---|---|
@@ -107,9 +133,12 @@ La instalación y el registro de cada tipo de agente se documentan en [`docs/des
 | **Wazuh** | 4.14.9 | SIEM: recogida de eventos, correlación, alertas, FIM, SCA y detección de vulnerabilidades |
 | **Proxmox VE** | 9.2.18 | Virtualización del servidor de monitorización |
 | **Debian** | 13 (*trixie*) | Sistema operativo del servidor Wazuh |
-| **OPNsense** | — | Firewall, router inter-VLAN y NAT de los puertos de agentes |
+| **OPNsense** | — | Firewall, router inter-VLAN y NAT de los puertos de agentes y RDP |
 | **FreeBSD** | 15.1 | Sistema operativo del firewall monitorizado |
 | **Windows 11 Pro** | 10.0.26300.9711 | Endpoint de escritorio monitorizado |
+| **Kali Linux** | Rolling | Estación de pruebas del laboratorio |
+| **Metasploitable 2** | 2.0 | VM vulnerable para pruebas controladas |
+| **xrdp** | — | Acceso gráfico remoto a Kali Linux |
 
 ---
 
@@ -121,6 +150,7 @@ La instalación y el registro de cada tipo de agente se documentan en [`docs/des
 | [Instalación de Wazuh](docs/installation.md) | Despliegue *todo en uno* en una VM de Proxmox |
 | [Despliegue de agentes](docs/despliegue-agentes.md) | Registro y configuración en Linux, Windows y OPNsense |
 | [Red y conectividad](docs/network.md) | Reglas NAT, puertos requeridos y comprobaciones |
+| [Laboratorio de pruebas](docs/pentesting.md) | Metasploitable 2, Kali Linux, xrdp y publicación de RDP |
 | [Dashboard y detección](docs/dashboard.md) | Overview, Discover, vulnerabilidades y SCA |
 | [Resolución de problemas](docs/troubleshooting.md) | Incidencias encontradas y soluciones aplicadas |
 
@@ -139,6 +169,7 @@ secops-lab/
 │   ├── despliegue-agentes.md
 │   ├── network.md
 │   ├── dashboard.md
+│   ├── pentesting.md
 │   └── troubleshooting.md
 ├── screenshots/
 │   ├── architecture/
@@ -146,6 +177,7 @@ secops-lab/
 │   ├── agents/
 │   ├── dashboard/
 │   ├── network/
+│   ├── pentesting/
 │   └── troubleshooting/
 ├── wazuh/
 │   └── rules/
@@ -167,8 +199,11 @@ La estructura se ampliará a medida que se incorporen reglas personalizadas, das
 - [x] Registrar agentes Linux, Windows y OPNsense
 - [x] Publicar los puertos de agentes mediante NAT en OPNsense
 - [x] Documentar la instalación, el despliegue de agentes y los dashboards
+- [x] Desplegar Metasploitable 2 en la VLAN de laboratorio
+- [x] Desplegar Kali Linux y habilitar el acceso RDP
+- [x] Publicar RDP (`3389/TCP`) mediante NAT en OPNsense
 - [ ] Configurar monitorización avanzada
-- [ ] Realizar pruebas de seguridad controladas
+- [ ] Ejecutar pruebas de seguridad controladas y documentar hallazgos
 - [ ] Documentar investigaciones
 
 ### Fase 2 — Ampliación
@@ -200,11 +235,13 @@ El proyecto no debe contener:
 
 Las pruebas de seguridad deben realizarse únicamente contra sistemas propios o entornos sobre los que exista autorización explícita.
 
+Metasploitable 2 es un sistema intencionadamente vulnerable y no debe exponerse fuera de la VLAN de laboratorio. El acceso RDP publicado en OPNsense debe limitarse a la VPN o a direcciones de confianza en un entorno real.
+
 ---
 
 <div align="center">
 
-**Última actualización:** 19/11/2026
+**Última actualización:** 20/11/2026
 
 ---
 
